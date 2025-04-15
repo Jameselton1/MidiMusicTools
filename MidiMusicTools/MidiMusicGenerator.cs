@@ -10,29 +10,80 @@ namespace MidiMusicTools {
   }
   
   public struct Song {
-    public List<Track> tracks;
+    public Track[] Tracks;
 
     public Mode Mode;
     public Note[] Scale;
-    public char[] SongStructure;
+    public char[] Sections;
     public char[] TrackStructure;
+    public TimeSignature TimeSignature;
+    public int PhrasesPerSection;
+    public int BarsPerPhrase;
+  }
+
+  public struct TimeSignature {
+    public int BeatsPerBar;
+    public int Denominator;
   }
   
   public struct Track {
-    public IList<MidiEvent> events;
-    public int instrument;
+    public IList<MidiEvent> Events;
+    public int Instrument;
+    public char Type;
   }
 
   public class SongGenerator {
 
     public Song NewSong() {
+      var random = new Random();
       var song = new Song();
 
-      song = SetSongProperties(song);
+      song = CreateSongProperties(song);
+
+      // Generate track properties
+      var tracks = new Track[song.TrackStructure.Length];
+      for (int i = 0; i < tracks.Length; i++) {
+        tracks[i] = new Track();
+        tracks[i].Type = song.TrackStructure[i];
+
+        switch (song.TrackStructure[i]) {
+          case 'C': tracks[i].Instrument = random.Next(32); break;
+          case 'M': tracks[i].Instrument = random.Next(8) + 80; break;
+          case 'B': tracks[i].Instrument = random.Next(8) + 32; break;
+        }
+      }
+
+      // Generate Music
+      for (int t = 0; t < tracks.Length; t++) {
+        for (int i = 0; i < song.Sections.Length; i++) {
+          int[,] rootNotes = GenerateRootNotes(song.BarsPerPhrase, song.TimeSignature.BeatsPerBar);
+          for (int p = 0; p < song.PhrasesPerSection; p++) {
+            for (int b = 0; b < song.BarsPerPhrase; b++) {
+              var notes = new Note[,]();
+              switch (tracks[i].Type) {
+                case 'M':
+                  
+              }
+            }
+          }
+        }
+      }
+
       return song;
     }
 
-    private Song SetSongProperties(Song song) {
+    private int[,] GenerateRootNotes(int barsPerPhrase, int beatsPerBar) {
+      var random = new Random();
+      var rootNotes = new int[barsPerPhrase, beatsPerBar];
+      for (int i  = barsPerPhrase; i < barsPerPhrase; i++) {
+        for (int j = beatsPerBar; j < beatsPerBar; j++) {
+          rootNotes[i, j] = random.Next(7);
+        }
+      }
+      return rootNotes;
+    }
+
+    private Song CreateSongProperties(Song song) {
       Random random = new Random();
 
       // Generate random mode
@@ -42,16 +93,20 @@ namespace MidiMusicTools {
       
       // Generate random song structure
       Array songStructureValues = System.Enum.GetValues(typeof(SongStructure));
-      SongStructure randomSongStructure = (SongStructure)songStructureValues.GetValue(random.Next(songStructureValues.Length));
+      SongStructure randomSections = (SongStructure)songStructureValues.GetValue(random.Next(songStructureValues.Length));
 
       //Generate random track structure
       Array trackStructureValues = System.Enum.GetValues(typeof(TrackStructure));
       TrackStructure randomTrackStructure = (TrackStructure)trackStructureValues.GetValue(random.Next(trackStructureValues.Length));
 
       // Assign values
+      song.BarsPerPhrase = 4;
+      song.PhrasesPerSection = 4;
+      song.TimeSignature.BeatsPerBar = 4;
+      song.TimeSignature.Denominator = 4;
       song.Mode = randomMode;
       song.Scale = CreateScale(root, song.Mode);
-      song.SongStructure = randomSongStructure.ToString().ToCharArray();
+      song.Sections = randomSections.ToString().ToCharArray();
       song.TrackStructure = randomTrackStructure.ToString().ToCharArray();
       return song;
     }
