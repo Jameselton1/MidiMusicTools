@@ -30,6 +30,7 @@ namespace MidiMusicTools {
     public IList<MidiEvent> Events;
     public int Instrument;
     public char Type;
+    public List<Note[,]> notes;
   }
 
   public class SongGenerator {
@@ -53,26 +54,53 @@ namespace MidiMusicTools {
         }
       }
 
-      // Generate Music
-      for (int t = 0; t < tracks.Length; t++) {
-        for (int i = 0; i < song.Sections.Length; i++) {
-          int[,] rootNotes = GenerateRootNotes(song.BarsPerPhrase, song.TimeSignature.BeatsPerBar);
+      // Generate Notes
+      for (int i = 0; i < song.Sections.Length; i++) {
+        for (int t = 0; t < tracks.Length; t++) {
+          var notes = new List<Note[,]>();
+          int[,] rootNotes = GenerateSectionRootNotes(song.BarsPerPhrase, song.TimeSignature.BeatsPerBar);
           for (int p = 0; p < song.PhrasesPerSection; p++) {
             for (int b = 0; b < song.BarsPerPhrase; b++) {
-              var notes = new Note[,]();
-              switch (tracks[i].Type) {
-                case 'M':
-                  
+              for (int bt = 0; bt < song.TimeSignature.BeatsPerBar; bt++) {
+                /*
+                * Dimension 1: subdivisions
+                * Dimension 2: num of notes played simultaneously
+                */
+                Note[,] barNotes = null;
+                switch (tracks[t].Type) {
+                  case 'M':
+                    barNotes = new Note[random.Next(3) + random.Next(2), 1];
+                    for (int j = 0; j < barNotes.Length; j++) {
+                      barNotes[j, 0] = song.Scale[random.Next(song.Scale.Length)];
+                    }
+                    break;
+                  case 'C':
+                    int[] chordFormula = ChordData.GetChordFormula(ChordType.Triad);
+                    barNotes = new Note[1, chordFormula.Length];
+                    for (int c = 0; c < chordFormula.Length; c++) {
+                      int index = (rootNotes[b, bt] + chordFormula[i]) % song.Scale.Length;
+                      barNotes[0, c] = song.Scale[index];
+                    }
+                    break;
+                  case 'B':
+                    barNotes = new Note[random.Next(2) + 1, 1];
+                    for (int j = 0; j < barNotes.Length; j++) {
+                      barNotes[j, 0] = (j == 0) ? song.Scale[rootNotes[j, i]] : song.Scale[random.Next(song.Scale.Length)];
+                    }
+                    break;
+                }
+                notes.Add(barNotes);
               }
             }
           }
+          tracks[t].notes = notes;
         }
       }
-
+      song.Tracks = tracks;
       return song;
     }
 
-    private int[,] GenerateRootNotes(int barsPerPhrase, int beatsPerBar) {
+    private int[,] GenerateSectionRootNotes(int barsPerPhrase, int beatsPerBar) {
       var random = new Random();
       var rootNotes = new int[barsPerPhrase, beatsPerBar];
       for (int i  = barsPerPhrase; i < barsPerPhrase; i++) {
