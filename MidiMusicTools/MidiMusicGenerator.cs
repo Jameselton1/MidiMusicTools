@@ -34,10 +34,10 @@ namespace MidiMusicTools
     public char Type;
     public List<Note[,]> notes;
 
-		public Track()
-		{
-		}
-	}
+    public Track()
+    {
+    }
+  }
 
   public class SongGenerator
   {
@@ -66,10 +66,10 @@ namespace MidiMusicTools
       // Generate Notes
       for (int i = 0; i < song.Sections.Length; i++)
       {
+        int[,] rootNotes = GenerateSectionRootNotes(song.BarsPerPhrase, song.TimeSignature.BeatsPerBar);
         for (int t = 0; t < tracks.Length; t++)
         {
           var notes = new List<Note[,]>();
-          int[,] rootNotes = GenerateSectionRootNotes(song.BarsPerPhrase, song.TimeSignature.BeatsPerBar);
           for (int p = 0; p < song.PhrasesPerSection; p++)
           {
             for (int b = 0; b < song.BarsPerPhrase; b++)
@@ -111,6 +111,7 @@ namespace MidiMusicTools
                     break;
                   case 'B':
                     numOfSubdivisions = random.Next(2) + 1;
+                    
                     noteDensity = 1;
 
                     beatNotes = new Note[numOfSubdivisions, noteDensity];
@@ -136,9 +137,9 @@ namespace MidiMusicTools
     {
       var random = new Random();
       var rootNotes = new int[barsPerPhrase, beatsPerBar];
-      for (int i = barsPerPhrase; i < barsPerPhrase; i++)
+      for (int i = 0; i < barsPerPhrase; i++)
       {
-        for (int j = beatsPerBar; j < beatsPerBar; j++)
+        for (int j = 0; j < beatsPerBar; j++)
         {
           rootNotes[i, j] = random.Next(7);
         }
@@ -188,9 +189,8 @@ namespace MidiMusicTools
       }
       return scale;
     }
-
   }
-  
+
   public class SongToMidiConverter
   {
     // MIDI File Types:
@@ -208,22 +208,21 @@ namespace MidiMusicTools
     {
       Track[] tracks = song.Tracks;
       tracks = AddChangeInstrumentsEvent(tracks);
-
       // generate note events
-      int timeElapsed = 0;
       for (int t = 0; t < tracks.Length; t++)
       {
+        int timeElapsed = 0;
         List<int[,]> midiNotes = GetMidiNotesFromTrack(tracks[t]);
         foreach (int[,] notes in midiNotes)
         {
           for (int x = 0; x < notes.GetLength(0); x++)
           {
-            int[] barNotes = new int[notes.GetLength(0)];
+            int[] barNotes = new int[notes.GetLength(1)];
             for (int y = 0; y < notes.GetLength(1); y++)
             {
               barNotes[y] = notes[x, y];
             }
-            int noteLength = (deltaTicksPerQuarterNote / notes.Length);
+            int noteLength = (deltaTicksPerQuarterNote / notes.GetLength(0));
             tracks[t] = AddNoteEvent(tracks[t], barNotes, timeElapsed, noteLength);
             timeElapsed += noteLength;
           }
@@ -261,9 +260,9 @@ namespace MidiMusicTools
 
     private Track AddNoteEvent(Track track, int[] notes, int startTime, int noteLength)
     {
-      int channel = 0;
+      int channel = 1;
       int velocity = 100;
-      foreach (int i in notes)
+      for (int i = 0; i < notes.Length; i++)
       {
         var noteEvent = new NoteOnEvent(startTime, channel, notes[i], velocity, noteLength);
         track.Events.Add(noteEvent);
@@ -274,7 +273,35 @@ namespace MidiMusicTools
 
     private List<int[,]> GetMidiNotesFromTrack(Track track)
     {
-      return new List<int[,]>();
+      List<Note[,]> notes = track.notes;
+      List<int[,]> intNotes = new List<int[,]>();
+      int octave;
+      switch (track.Type)
+      {
+        case 'C': octave = 4; break;
+        case 'B': octave = 3; break;
+        case 'M': octave = 6; break;
+        default: octave = 5; break;
+      }
+
+      for (int i = 0; i < notes.Count; i++)
+      {
+        int dimensionOne = notes[i].GetLength(0);
+        int dimensionTwo = notes[i].GetLength(1);
+        intNotes.Add(new int[dimensionOne, dimensionTwo]);
+
+        for (int x = 0; x < notes[i].GetLength(0); x++)
+        {
+          for (int y = 0; y < notes[i].GetLength(1); y++)
+          {
+            var allNotes = Note.GetValues(typeof(Note));
+            int noteIndex = Array.IndexOf(allNotes, notes[i][x, y]);
+            intNotes[i][x, y] = noteIndex + (12 * octave);
+          }
+        }
+      }
+
+      return intNotes;
     }
   }
 }
