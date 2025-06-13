@@ -68,23 +68,26 @@ namespace MidiMusicTools
 								Note[,] beatNotes = null;
 								int numOfSubdivisions = 0;
 								int noteDensity = 0;
+								int[] chordFormula;
 								switch (tracks[t].Type)
 								{
 									// Melody
 									case 'M':
-										numOfSubdivisions = random.Next(3) + random.Next(2);
+										chordFormula = ChordData.GetChordFormula(ChordType.Power);
+										numOfSubdivisions = random.Next(2) + 1;
 										noteDensity = 1;
 
 										beatNotes = new Note[numOfSubdivisions, noteDensity];
 
 										for (int s = 0; s < numOfSubdivisions; s++)
 										{
-											beatNotes[s, 0] = songProps.Scale[random.Next(songProps.Scale.Length)];
+											int index = (rootNotes[b, bt] + chordFormula[random.Next(chordFormula.Length)]) % songProps.Scale.Length;
+											beatNotes[s, 0] = songProps.Scale[index];
 										}
 										break;
 									// Chord
 									case 'C':
-										int[] chordFormula = ChordData.GetChordFormula(ChordType.Triad);
+										chordFormula = ChordData.GetChordFormula(ChordType.Triad);
 										numOfSubdivisions = 1;
 										noteDensity = chordFormula.Length;
 
@@ -98,9 +101,9 @@ namespace MidiMusicTools
 										break;
 									// Bassline
 									case 'B':
-										numOfSubdivisions = random.Next(2) + 1;
+										numOfSubdivisions = 1;
 
-										numOfNotesAtATime = 1;
+										int numOfNotesAtATime = 1;
 
 										beatNotes = new Note[numOfSubdivisions, numOfNotesAtATime];
 
