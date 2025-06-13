@@ -9,7 +9,6 @@
    * B: Bass
    */
   public enum TrackStructure {
-    MCB,
-    MC
+    MCB
   }
 }
