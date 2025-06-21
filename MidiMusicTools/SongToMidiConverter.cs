@@ -15,10 +15,10 @@ public class SongToMidiConverter
   // A track contains a list of MidiEvents.
   // This means I need to create a list of MidiEvents for 
   // each track and then add each to MidiEventCollections
-  public MidiEventCollection GenerateMidi(Song song)
+  public MidiEventCollection GenerateMidi(Song song, int melodyInstrument = 25, int chordInstrument = 1, int bassInstrument = 34)
   {
     Track[] tracks = song.Tracks;
-    tracks = AddChangeInstrumentsEvent(tracks);
+    tracks = AddChangeInstrumentsEvent(tracks, melodyInstrument, chordInstrument, bassInstrument);
     // generate note events
     for (int t = 0; t < tracks.Length; t++)
     {
@@ -54,16 +54,21 @@ public class SongToMidiConverter
     MidiFile.Export(exportFilePath, events);
   }
 
-  private Track[] AddChangeInstrumentsEvent(Track[] tracks)
+  private Track[] AddChangeInstrumentsEvent(Track[] tracks, int melodyInstrument, int chordInstrument, int bassInstrument)
   {
+    var instruments = new List<int> {
+			melodyInstrument,
+			chordInstrument,
+			bassInstrument
+		};
+
     // Change instruments and then return values.
     for (int i = 0; i < tracks.Length; i++)
     {
       // Change instrument midievent
       int timeInTicks = 0;
       int channel = 1;
-      int instrument = 50;
-      var instrumentEvent = new PatchChangeEvent(timeInTicks, channel, instrument);
+      var instrumentEvent = new PatchChangeEvent(timeInTicks, channel, instruments[i]);
       tracks[0].Events.Add(instrumentEvent);
     }
     return tracks;

@@ -7,7 +7,6 @@ namespace MidiMusicTools
 	{
 		public int Root;
 		public Mode Mode;
-		public Note[] Scale;
 		public char[] Sections;
 		public char[] TrackStructure;
 		public TimeSignature TimeSignature;
@@ -47,6 +46,8 @@ namespace MidiMusicTools
 					case 'B': tracks[i].Instrument = random.Next(8) + 32; break;
 				}
 			}
+			
+			Note[] scale = CreateScale(songProps.Root, songProps.Mode);
 
 			// Generate Notes
 			for (int i = 0; i < songProps.Sections.Length; i++)
@@ -81,8 +82,8 @@ namespace MidiMusicTools
 
 										for (int s = 0; s < numOfSubdivisions; s++)
 										{
-											int index = (rootNotes[b, bt] + chordFormula[random.Next(chordFormula.Length)]) % songProps.Scale.Length;
-											beatNotes[s, 0] = songProps.Scale[index];
+											int index = (rootNotes[b, bt] + chordFormula[random.Next(chordFormula.Length)]) % scale.Length;
+											beatNotes[s, 0] = scale[index];
 										}
 										break;
 									// Chord
@@ -95,8 +96,8 @@ namespace MidiMusicTools
 
 										for (int c = 0; c < chordFormula.Length; c++)
 										{
-											int index = (rootNotes[b, bt] + chordFormula[c]) % songProps.Scale.Length;
-											beatNotes[0, c] = songProps.Scale[index];
+											int index = (rootNotes[b, bt] + chordFormula[c]) % scale.Length;
+											beatNotes[0, c] = scale[index];
 										}
 										break;
 									// Bassline
@@ -109,7 +110,7 @@ namespace MidiMusicTools
 
 										for (int s = 0; s < numOfSubdivisions; s++)
 										{
-											beatNotes[s, 0] = (s == 0) ? songProps.Scale[rootNotes[b, bt]] : songProps.Scale[random.Next(songProps.Scale.Length)];
+											beatNotes[s, 0] = (s == 0) ? scale[rootNotes[b, bt]] : scale[random.Next(scale.Length)];
 										}
 										break;
 								}
@@ -157,7 +158,6 @@ namespace MidiMusicTools
 			// Assign values
 			songProps.Root = root;
 			songProps.Mode = randomMode;
-			songProps.Scale = CreateScale(root, songProps.Mode);
 			songProps.Sections = randomSections.ToString().ToCharArray();
 			songProps.TrackStructure = randomTrackStructure.ToString().ToCharArray();
 
