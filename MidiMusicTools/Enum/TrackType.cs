@@ -8,7 +8,10 @@
    * C: Chorus
    * B: Bass
    */
-  public enum TrackStructure {
-    MCB
+  public enum TrackType
+  {
+    Melody,
+    Chord,
+    Bassline
   }
 }
