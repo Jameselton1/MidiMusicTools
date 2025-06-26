@@ -13,7 +13,7 @@ namespace MidiMusicTools.Models
 		public int BarsPerPhrase { get; set; }
 
 		public readonly List<Note> Scale => NoteGeneratorHelpers.GenerateScale(Root, Mode);
-		public readonly int TotalBeats => Sections.Count * PhrasesPerSection * BarsPerPhrase * TimeSignature.Nominator;
+		public readonly int TotalBeats => Sections.Count * PhrasesPerSection * BarsPerPhrase * TimeSignature.Numerator;
 
 		public SongProperties()
 		{ 

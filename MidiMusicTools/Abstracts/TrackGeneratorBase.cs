@@ -73,7 +73,7 @@ namespace MidiMusicTools.Abstracts
 		{
 			var beats = new List<Beat>();
 
-			for (int i = 0; i < songProps.TimeSignature.Nominator; i++)
+			for (int i = 0; i < songProps.TimeSignature.Numerator; i++)
 			{
 				beats.Add(GenerateBeat());
 			}

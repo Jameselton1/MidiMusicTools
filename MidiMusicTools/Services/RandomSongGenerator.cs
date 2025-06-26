@@ -24,7 +24,7 @@ namespace MidiMusicTools.Services
 
 			songProps.TimeSignature = new TimeSignature
 			{
-				Nominator = 4,
+				Numerator = 4,
 				Denominator = 4
 			};
 			

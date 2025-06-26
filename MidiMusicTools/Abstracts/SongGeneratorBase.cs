@@ -5,7 +5,7 @@ using MidiMusicTools.Interfaces;
 
 namespace MidiMusicTools.Abstracts
 {
-	public abstract class SongGeneratorBase
+	public abstract class SongGeneratorBase : ISongGenerator
 	{
 		public Song GenerateSong()
 		{
