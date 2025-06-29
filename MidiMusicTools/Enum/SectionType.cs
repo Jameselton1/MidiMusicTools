@@ -1,4 +1,5 @@
-﻿namespace MidiMusicTools.Enum {
+﻿namespace MidiMusicTools.Enum
+{
   public enum SectionType
   {
     Verse,

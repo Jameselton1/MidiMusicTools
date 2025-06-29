@@ -4,14 +4,18 @@ using MidiMusicTools.Abstracts;
 
 namespace MidiMusicTools.Services
 {
-	public class MelodyTrackGenerator() : TrackGeneratorBase
+	/// <summary>
+	/// Generates a melody track by selecting random notes from a power chord
+	/// built on the root note for each beat. Each beat can have a random number of subdivisions.
+	/// </summary>
+	public class MelodyTrackGenerator : TrackGeneratorBase
 	{
 		private int NOTES_AT_ONCE = 1;
 
-		// Generates a melody by:
-		// 1 note playing at a time
-		// random number of subdivisions
-		// notes selected from within a chord, based on the current root note
+		/// <summary>
+		/// Generates a single beat for the melody track.
+		/// Each subdivision contains one random note from a power chord.
+		/// </summary>
 		protected override Beat GenerateBeat()
 		{
 			Note rootNote = rootNotes.Dequeue();
@@ -26,12 +30,12 @@ namespace MidiMusicTools.Services
 
 				for (int n = 0; n < NOTES_AT_ONCE; n++)
 				{
-					// Figure out the index of the note we want by:
 					// Create a chord with this beat's root note
-					List<Note> chordNotes = ChordData.GetChordNotes(ChordType.Power, rootNote, scale);
+					List<Note> chordNotes = ChordData.GetChordNotes(ChordType.Power, rootNote, songProps.Scale);
 					// Choose a random note from the chord
 					int noteIndex = random.Next(chordNotes.Count);
 					Note melodyNote = chordNotes[noteIndex];
+					// Calculate Midi note value based on octave and note
 					subdivision.MidiNotes.Add((int)melodyNote + MusicConstants.NUM_OF_NOTES * MidiOctave);
 				}
 				beat.Subdivisions.Add(subdivision);
@@ -40,13 +44,14 @@ namespace MidiMusicTools.Services
 			return beat;
 		}
 
-		protected override int GenerateMidiInstrument()
-		{
-			return 28;
-		}
-		protected override int GenerateMidiOctave()
-		{
-			return 6;
-		}
+		/// <summary>
+		/// Returns the default MIDI instrument for melody (Electric Guitar).
+		/// </summary>
+		protected override int DefaultMidiInstrument() => 28;
+
+		/// <summary>
+		/// Returns the default octave for melody.
+		/// </summary>
+		protected override int DefaultOctave() => 6;
 	}
 }

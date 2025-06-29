@@ -1,9 +1,11 @@
-﻿namespace MidiMusicTools.Enum {
-  /*
-   * Modes are the blueprint for constructing the scale.
-   * This is explained at https://ledgernote.com/columns/music-theory/musical-modes-explained/
-   */
-  public enum Mode {
+﻿namespace MidiMusicTools.Enum
+{
+  /// <summary>
+  /// Represents musical modes, which are blueprints for constructing scales.
+  /// Each mode defines a unique pattern of intervals within an octave.
+  /// </summary>
+  public enum Mode
+  {
     Major,
     Minor,
     Dorian,
@@ -14,10 +16,16 @@
     Melodic,
     Mixolydian,
     Phrygian
-    
   }
 
-  public static class ScaleData {
+  /// <summary>
+  /// Provides scale templates (interval patterns) for each musical mode.
+  /// </summary>
+  public static class ScaleData
+  {
+    /// <summary>
+    /// Maps each Mode to its corresponding scale template (intervals from the root note).
+    /// </summary>
     public static readonly Dictionary<Mode, int[]> ScaleTemplates = new()
     {
         { Mode.Major,       new[] { 0, 2, 4, 5, 7, 9, 11 } },
@@ -32,7 +40,13 @@
         { Mode.Phrygian,    new[] { 0, 1, 3, 5, 7, 8, 10 } }
     };
 
-    public static int[] GetScaleTemplate(Mode mode) {
+    /// <summary>
+    /// Gets the scale template (intervals) for the specified mode.
+    /// </summary>
+    /// <param name="mode">The musical mode.</param>
+    /// <returns>An array of intervals representing the scale, or null if not found.</returns>
+    public static int[] GetScaleTemplate(Mode mode)
+    {
       return ScaleTemplates.TryGetValue(mode, out var intervals) ? intervals : null;
     }
   }

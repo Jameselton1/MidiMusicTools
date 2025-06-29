@@ -14,30 +14,32 @@ namespace MidiMusicTools.Abstracts
 			var songProps = BuildSongProperties();
 			var rootNoteGenerator = BuildRootNoteGenerator();
 			// Generate Notes
-			song.Tracks = GenerateTrackNotes(songProps, rootNoteGenerator);
+			// Generate root notes, which NoteGenerator generates notes around
+			Queue<Note> rootNotes = rootNoteGenerator.GenerateRootNotes(songProps.TotalBeats, songProps.Scale);
+			song.Tracks = GenerateTracks(songProps, rootNotes);
 
 			return song;
 		}
 
-		protected List<Track> GenerateTrackNotes(SongProperties songProps, IRootNoteGenerator rootNoteGenerator)
+		protected List<Track> GenerateTracks(SongProperties songProps, Queue<Note> rootNotes)
 		{
-			// Generate root notes, which NoteGenerator generates notes around
-			Queue<Note> rootNotes = rootNoteGenerator.GenerateRootNotes(songProps.TotalBeats, songProps.Scale);
-
-			// Generate Notes
+			// Initialise new track
 			var listTracks = new List<Track>();
-			foreach (TrackType trackType in songProps.TrackStructure)
+			// Generate notes for the new track
+			foreach (TrackProperties trackProperties in songProps.TrackStructure)
 			{
-				ITrackGenerator generator = trackType switch
+				ITrackGenerator generator = trackProperties.Type switch
 				{
 					TrackType.Melody => new MelodyTrackGenerator(),
 					TrackType.Chord => new ChordTrackGenerator(),
 					TrackType.Bassline => new BasslineTrackGenerator(),
-					_ => throw new NotSupportedException($"TrackType {trackType} not supported")
+					_ => throw new NotSupportedException($"TrackType {trackProperties.Type} not supported")
 				};
-
-				listTracks.Add(generator.GenerateTrack(songProps, rootNotes));
+				var rootNotesCopy = new Queue<Note>(rootNotes);
+				// Add track to tracklist
+				listTracks.Add(generator.GenerateTrack(songProps, rootNotesCopy, trackProperties.Instrument, trackProperties.Octave));
 			}
+			// return tracklist
 			return listTracks;
 		}
 

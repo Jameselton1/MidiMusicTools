@@ -1,6 +1,10 @@
-﻿namespace MidiMusicTools.Enum {
-  // Contains each possible note value according to the chromatic scale
-  public enum Note {
+﻿namespace MidiMusicTools.Enum
+{
+  /// <summary>
+  /// Represents a chromatic note in the 12-tone scale.
+  /// </summary>
+  public enum Note
+  {
     C = 0,
     Cs = 1,
     D = 2,
@@ -9,7 +13,7 @@
     F = 5,
     Fs = 6,
     G = 7,
-    Gs = 8, 
+    Gs = 8,
     A = 9,
     As = 10,
     B = 11

@@ -2,73 +2,94 @@ using MidiMusicTools.Abstracts;
 using MidiMusicTools.Interfaces;
 using MidiMusicTools.Models;
 using MidiMusicTools.Enum;
+using MidiMusicTools.Services;
 
-namespace MidiMusicTools.Services
+namespace TestMidiTools.Services
 {
-	public class RandomPropertiesSongGenerator() : SongGeneratorBase
-	{
-		private Random random = new Random();
+    /// <summary>
+    /// Generates a random song structure, sections, tracks, and root notes.
+    /// Used for procedural music generation.
+    /// </summary>
+    public class RandomSongGenerator : SongGeneratorBase
+    {
+        private Random random = new Random();
 
-		protected override SongProperties BuildSongProperties()
-		{
-			var songProps = new SongProperties();
+        /// <summary>
+        /// Builds random song properties (root, mode, sections, track structure, etc.).
+        /// </summary>
+        protected override SongProperties BuildSongProperties()
+        {
+            var songProps = new SongProperties();
 
-			// Assign values
-			songProps.Root = GenerateRoot();
-			songProps.Mode = GenerateMode();
-			songProps.Sections = GenerateSections();
-			songProps.TrackStructure = GenerateTrackTypes();
+            // Assign values
+            songProps.Root = GenerateRoot();
+            songProps.Mode = GenerateMode();
+            songProps.Sections = GenerateSections();
+            songProps.TrackStructure = GenerateTrackProperties();
 
-			songProps.BarsPerPhrase = 4;
-			songProps.PhrasesPerSection = 2;
+            songProps.BarsPerPhrase = 4;
+            songProps.PhrasesPerSection = 2;
 
-			songProps.TimeSignature = new TimeSignature
-			{
-				Numerator = 4,
-				Denominator = 4
-			};
-			
-			return songProps;
-		}
+            songProps.TimeSignature = new TimeSignature
+            {
+                Numerator = 4,
+                Denominator = 4
+            };
 
-		protected override IRootNoteGenerator BuildRootNoteGenerator()
-		{
-			return new RandomRootNoteGenerator();
-		}
+            return songProps;
+        }
 
-		private int GenerateRoot()
-		{
-			return random.Next(MusicConstants.NUM_OF_NOTES);
-		}
+        /// <summary>
+        /// Returns a random root note generator.
+        /// </summary>
+        protected override IRootNoteGenerator BuildRootNoteGenerator()
+        {
+            return new RandomRootNoteGenerator();
+        }
 
-		private Mode GenerateMode()
-		{
-			Array modeValues = System.Enum.GetValues(typeof(Mode));
-			Mode randomMode = (Mode)modeValues.GetValue(random.Next(modeValues.Length));
-			return randomMode;
-		}
+        private int GenerateRoot() => random.Next(MusicConstants.NUM_OF_NOTES);
 
-		private List<SectionType> GenerateSections()
-		{
-			return new List<SectionType>()
-			{
-				SectionType.Verse,
-				SectionType.Chorus,
-				SectionType.Verse,
-				SectionType.Chorus,
-				SectionType.Verse,
-				SectionType.Chorus
-			};
-		}
+        private Mode GenerateMode()
+        {
+            Array modeValues = System.Enum.GetValues(typeof(Mode));
+            Mode randomMode = (Mode)modeValues.GetValue(random.Next(modeValues.Length));
+            return randomMode;
+        }
 
-		private List<TrackType> GenerateTrackTypes()
-		{
-			return new List<TrackType>()
-			{
-				TrackType.Melody,
-				TrackType.Chord,
-				TrackType.Bassline
-			};
-		}
-	}
+        private List<SectionType> GenerateSections()
+        {
+            // Example: Alternates Verse and Chorus
+            return new List<SectionType>()
+            {
+                SectionType.Verse,
+                SectionType.Chorus,
+                SectionType.Verse,
+                SectionType.Chorus,
+                SectionType.Verse,
+                SectionType.Chorus
+            };
+        }
+
+        private List<TrackProperties> GenerateTrackProperties()
+        {
+            return new List<TrackProperties>()
+            {
+                new TrackProperties() {
+                    Type = TrackType.Melody,
+                    Instrument = -1,
+                    Octave = -1
+                },
+                new TrackProperties() {
+                    Type = TrackType.Chord,
+                    Instrument = -1,
+                    Octave = -1
+                },
+                new TrackProperties() {
+                    Type = TrackType.Bassline,
+                    Instrument = -1,
+                    Octave = -1
+                },
+            };
+        }
+    }
 }
