@@ -28,16 +28,11 @@ namespace MidiMusicTools.Abstracts
 			// Generate notes for the new track
 			foreach (TrackProperties trackProperties in songProps.TrackStructure)
 			{
-				ITrackGenerator generator = trackProperties.Type switch
-				{
-					TrackType.Melody => new MelodyTrackGenerator(),
-					TrackType.Chord => new ChordTrackGenerator(),
-					TrackType.Bassline => new BasslineTrackGenerator(),
-					_ => throw new NotSupportedException($"TrackType {trackProperties.Type} not supported")
-				};
+				ITrackGenerator generator = NoteGeneratorHelpers.TrackTypeGeneratorRegistry[trackProperties.Type];
 				var rootNotesCopy = new Queue<Note>(rootNotes);
 				// Add track to tracklist
-				listTracks.Add(generator.GenerateTrack(songProps, rootNotesCopy, trackProperties.Instrument, trackProperties.Octave));
+				Track track = generator.GenerateTrack(songProps, rootNotesCopy, trackProperties.Instrument, trackProperties.Octave);
+				listTracks.Add(track);
 			}
 			// return tracklist
 			return listTracks;

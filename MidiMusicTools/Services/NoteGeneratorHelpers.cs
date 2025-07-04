@@ -1,4 +1,5 @@
 using MidiMusicTools.Enum;
+using MidiMusicTools.Interfaces;
 
 namespace MidiMusicTools.Services
 {
@@ -27,5 +28,12 @@ namespace MidiMusicTools.Services
 			}
 			return scale;
 		}
+
+		public static readonly Dictionary<TrackType, ITrackGenerator> TrackTypeGeneratorRegistry = new()
+		{
+			{TrackType.Bassline,	new BasslineTrackGenerator()},
+			{TrackType.Chord,	new ChordTrackGenerator()},
+			{TrackType.Melody,	new MelodyTrackGenerator()}
+		};
 	}
 }
